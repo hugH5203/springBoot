@@ -1,0 +1,132 @@
+spring:
+  profiles:
+    active: one  #启用one模式的profile
+  thymeleaf:  #thymeleaf相关设置
+    cache: false  #禁用thymeleaf的缓存，因为有些内容要实时生效
+  messages:   #国际化设置
+    basename: i18n.login   #设置国际化配置文件的包名与其文件的基础名,即资源路径
+    encoding: UTF-8   #设置国际化编码
+
+  mvc:
+    format:      #设置日期格式
+      date: yyyy-MM-dd HH:mm
+
+      #配置数据源
+  datasource:  #对连接池的参数设置(springboot1默认使用Tomcat的数据源，2版本默认使用Hikari的数据源)
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.138.6:3307/jdbc?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull  #这里使用的mysql数据库是我虚拟机用docker下载的mysql镜像（mysql5.5版本的那个），映射的是主机的3307端口
+    driver-class-name: com.mysql.cj.jdbc.Driver  #springboot2.0及以上版本的mysql驱动默认使用mysql8.0以上，所以最好加上cj，有需要可以去pom里改驱动依赖
+    #修改数据源类型，记得导入相应依赖
+    type: com.alibaba.druid.pool.DruidDataSource   #用这个属性可以改变springboot使用的连接池(改为Druid)
+    #   数据源其他配置
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    #   配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,slf4j
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+
+  #schema: #数据源生成时自动运行指定目录下的sql文件（DDL语句，sql定义语言，建表，删表，修改表的结构如约束等等），路径写法如：- classpath：xxx.sql
+  #data:   #数据源生成时自动运行指定目录下的sql文件(DML语句，sql操作语言，增删改查)，也可以直接写在resource目录下，格式必须为：schema-某某.sql或data-某某.swl
+
+#配置mybatis的xml配置写法，就像原生的mybatis一样写就好了
+#mybatis:
+#  config-location:    #mybatis的主配置文件位置(放在resource下)如：classpath:mybatis/sqlMapConfig.xml
+#  mapper-locations:   #mapper接口映射位置如：classpath:mybatis/mapper/*.xml  (这个一定要按包的结构来建文件夹)
+#  configuration:
+#    map-underscore-to-camel-case: true    #配置表中字段与JavaBean的属性不一致时，开启驼峰字符串对应规则
+
+  #对jpa的一些配置
+  jpa:
+    hibernate:
+      ddl-auto: update    #每次运行sql语句需要重新创建数据表结构的类型语句
+    show-sql: true        #控制台是否显示运行的SQL语句
+
+#配置redis的相关设置
+  redis:
+    host: 192.168.138.6   #这里我配置了主机号是因为，springboot会访问默认的端口号6379，所以不用写端口号（只要你没换）。至于密码嘛，我没配置密码
+    #port: 6379
+    #password:   #redis密码
+  cache:
+    redis:
+      time-to-live: 60000   #设置redisCache的缓存过期时间
+#server: #设置默认的项目访问路径
+#  servlet:
+#    context-path: /boot_test1
+
+#debug: true  #启用debug模式打印报告，可以看见启动时那些配置生效
+
+#配置rabbit消息中间件的一些参数
+  rabbitmq:
+    host: 192.168.138.6   #默认访问15672这个消息队列管理端口，进行管理
+    username: guest
+    password: guest
+#虚拟主机的host（虚拟主机里有着需要的相关的一切组件，本质上就是一个mini的rabbitMQ服务器，拥有自己的交换器，队列，绑定与权限机制。它是AMQP概念的基础，必须在连接时指定。）
+   # virtual-host: /     #由于系统默认没写就是/，所以写不写都一样。
+
+#配置邮件任务的参数
+  mail:
+    username: 1936489510@qq.com
+    password: dshutuyeoyvkbdej #开启SMTP服务，使用邮箱授权码
+    host: smtp.qq.com
+
+    #设置是否使用ssl安全机制，springboot2.0不配置该属性可以发送
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
+logging:   #设置springboot该包及其子包下默认的日志级别，以后只会打印该级别与更高级别的日志
+  level:
+    com:
+      wenliuniversity:
+        springbootTest: debug
+#  file:  #指定日志文件生成的路径，像我这么写会在c盘下生成springbootTest文件夹，里面是spring.log
+#    path: /springbootTest/log
+
+
+---   #yaml的分模块模式，一般用于有多种模式时
+server:
+  port: 8082
+person:  #这是yaml注入实体类的一种写法，用的是set方式注入，所以记得写set方法.键与值之间有个空格，在：后面，一定记得要打空格
+  lastName: only you
+  age: 18
+  boss: true
+  birth: 1999/06/08
+  lists: [list01,list02]
+  man: {name: 黄海,age: 18}
+  maps: {k1: 仙人,k2: 瞎说}
+spring:
+  profiles: one  #可以在active里指定用哪种模式，哪种Profiles,也可以在虚拟机参数中指定
+---
+
+server:
+  port: 8083
+person: #这是yaml注入实体类的第二种写法，关键就是除了普通类型，其他类型有行内式与换行式
+  man:
+    name: 黄海
+    age: 21
+  last-name: huanghai
+  age: 21
+  boss: true
+  birth: 1999/06/08
+  lists:
+    - list01
+    - list02
+  maps:
+    k1: v1
+    k2: v2
+spring:
+  profiles: two

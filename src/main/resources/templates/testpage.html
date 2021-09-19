@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>测试thymeleaf的语法</title>
+</head>
+<body>
+<div class="haha" th:insert="success::copy">  <!--也可以这样写th:insert="文件夹名/success::#id名，即引入某文件夹下success页面-->
+    <!--下id为xx的代码，两个页面都在同一文件夹下就可以把文件夹名省略。连上一个页面的th:fragment="copy"也可以省略不写了（接上）-->
+    <p>thymeleaf</p>
+    测试thymeleaf的insert引入片段，既保留自己的主标签，也保留引入的主标签</div>
+<div th:replace="success::copy">测试thymeleaf的replace引入片段，不保留自己的主标签，只保留引入的主标签</div>
+<div th:include="success::copy">测试thymeleaf的insert引入片段，保留自己的主标签，不保留引入的主标签</div>
+<br>
+<p th:each="man:${mans}" th:text="${man}">mans</p> <!--这是测试thymeleaf的each取值语法-->
+<br>
+ <p th:each="man:${mans}">[[${man}]]</p>  <!--这是测试thymeleaf的行内取值语法，可以直接用在文本中-->
+<br>
+
+<p>上面的insert与include引入方式（模板名：：声明的片段名）都只会保留父标签的标签与属性，不会保留标签里的内容，当然，
+    被引入的标签不算，因为引的就是被引入的内容</p>
+</body>
+</html>
